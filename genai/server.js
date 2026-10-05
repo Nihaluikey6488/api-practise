@@ -15,7 +15,7 @@ import { AIMessage, HumanMessage, tool, createAgent } from "langchain";
 const model = new ChatMistralAI({
   model: "voxtral-small-latest",
   apiKey: process.env.MISTRAL_API_KEY,
-  temperature:0
+  temperature: 0,
 });
 
 const rl = await readline.createInterface({
@@ -30,7 +30,7 @@ const rl = await readline.createInterface({
 // }
 
 async function readMemoryFromFIle() {
-   console.log("📖 readMemory started");
+  console.log("📖 readMemory started");
 
   try {
     const data = await fs.readFile("./memory.md", "utf-8");
@@ -43,6 +43,23 @@ async function readMemoryFromFIle() {
     throw error;
   }
 }
+
+async function getCurrentDate() {
+  const today = new Date();
+
+  return today.toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+const currentDateTool = tool(getCurrentDate, {
+  name: "getCurrentDate",
+  description: "Get the current date in india",
+  schema: z.object({}),
+});
 
 const readMemory = tool(readMemoryFromFIle, {
   name: "readMemory",
@@ -70,11 +87,9 @@ const updateMemory = tool(updateMemoryFromFile, {
   }),
 });
 
-// console.log(typeof model.bindTools);
-
 const agent = createAgent({
   model,
-  tools: [readMemory, updateMemory],
+  tools: [readMemory, updateMemory, currentDateTool],
   systemPrompt: `
 You are a helpful personal assistant with persistent memory.
 
@@ -92,6 +107,7 @@ Memory rules:
 7. Use updateMemory to save the complete updated memory.
 8. Do not save temporary, irrelevant, or sensitive information.
 9. After saving, respond naturally and confirm only if the tool succeeds.
+10.Use getCurrentDate when the user asks for today's date or needs the current date to answer a question, Always use the tool for current-date queries.
 `,
 });
 
@@ -105,10 +121,6 @@ while (true) {
   const response = await agent.invoke({
     messages,
   });
-
-  // for await(let [chunk] of response){
-  //   process.stdout.write(chunk)
-  // }
 
   const lastMessage = response.messages.at(-1);
   messages.push(new AIMessage(lastMessage.content));
