@@ -1,7 +1,7 @@
 import { ChatMistralAI } from "@langchain/mistralai";
 import { env } from "../config/env";
 import * as z from "zod";
-import { AIMessage, createAgent, HumanMessage } from "langchain";
+import { AIMessage, createAgent, HumanMessage, ToolMessage } from "langchain";
 import { MongoMessage } from "../types/chat";
 import { getWebResultTool, readMemoryTool, updateMemoryTool } from "./ai/tool";
 
@@ -79,13 +79,25 @@ Memory rules:
       messages: messages.map((message) => {
         if (message.author === "user") {
           return new HumanMessage(message.content);
+        } else if (message.author === "ai") {
+          return new AIMessage({
+            content: message.content,
+            tool_calls: message.toolCalls?.map((toolCall) => ({
+              name: toolCall.name || "",
+              args: toolCall.arguments || {},
+              id: toolCall.id || "",
+            })),
+          });
         } else {
-          return new AIMessage(message.content);
+          return new ToolMessage({
+            content: message.content,
+            tool_call_id: message.toolCallId || "",
+          });
         }
       }),
     },
     {
-      streamMode: ["messages","values"],
+      streamMode: ["messages", "values"],
       configurable: {
         userId: userId,
       },

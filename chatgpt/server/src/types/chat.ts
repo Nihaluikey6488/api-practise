@@ -4,9 +4,15 @@ export type RequestMessage = {
 };
 
 export type Message = {
-  author: "user" | "ai";
+  author: "user" | "ai" | "tool";
   content: string;
   conversation: string;
+  toolCalls?:{
+    arguments?:Record<string,unknown>;
+    id?:string | null;
+    name?:string | null;
+  }[];
+  toolCallId?:string | null;
 };
 
 export type MongoMessage = Message & {

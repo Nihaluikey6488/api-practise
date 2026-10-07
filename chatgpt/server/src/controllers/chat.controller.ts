@@ -1,3 +1,9 @@
+import {
+  AIMessage,
+  AIMessageChunk,
+  HumanMessage,
+  ToolMessage,
+} from "langchain";
 import { conversationDao } from "../dao/conversation.dao.js";
 import { messageDao } from "../dao/message.dao.js";
 import { getConversationTitle, getStream } from "../service/ai.service.js";
@@ -42,8 +48,12 @@ export const getConversation = asyncHandler(
       throw new ApiError(404, "Conversation not found");
     }
 
-    const messages = await messageDao.findMessagesByConversation(
-      conversation._id.toString(),
+    const messages = (
+      await messageDao.findMessagesByConversation(conversation._id.toString())
+    ).filter(
+      (message) =>
+        message.author === "user" ||
+        (message.author === "ai" && message.toolCalls?.length === 0),
     );
 
     res.status(200).json({
@@ -101,12 +111,10 @@ export const chatController = asyncHandler(
       conversation: conversationId,
     });
 
+    const messages =
+      await messageDao.findMessagesByConversation(conversationId);
 
-const messages=await messageDao.findMessagesByConversation(conversationId)
-
-
-    const stream = await getStream({ messages,userId:user.userId });
-
+    const stream = await getStream({ messages, userId: user.userId });
 
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -117,35 +125,51 @@ const messages=await messageDao.findMessagesByConversation(conversationId)
       encodeURIComponent(conversationTitle),
     );
 
+    // let aiMessage: string = "";
 
-
-    let aiMessage: string = "";
-
-    for await (const [mode,data] of stream) {
-      if(mode==="messages"){
-        const [token,metadata] =data;
-        if(token.getType()==="ai"){
-          res.write(`data:${JSON.stringify(token.text)}\n\n`)
-          aiMessage+=token.text
+    for await (const [mode, data] of stream) {
+      if (mode === "messages") {
+        const [token, metadata] = data;
+        if (token.getType() === "ai") {
+          res.write(`data:${JSON.stringify(token.text)}\n\n`);
+          // aiMessage += token.text;
         }
-        
-      }else if(mode==="values"){
-          console.log("Received values:",data)
-        }
-      
+      } else if (mode === "values") {
+        console.log("Received values:", data);
+        const currentStateMessage: (HumanMessage | AIMessage | ToolMessage)[] =
+          data.messages;
 
-      
+        const newMessage = currentStateMessage.at(-1);
+        console.log("New message: ", newMessage);
+
+        if (newMessage instanceof AIMessageChunk) {
+          console.log("AIMessageChunk received:", newMessage.tool_calls);
+
+          await messageDao.createMessage({
+            content: newMessage.text || "no content",
+            author: "ai",
+            conversation: conversationId,
+            toolCalls: newMessage.tool_calls
+              ? newMessage.tool_calls.map((call) => {
+                  return {
+                    arguments: call.args,
+                    id: call.id ?? "",
+                    name: call.name,
+                  };
+                })
+              : [],
+          });
+        } else if (newMessage instanceof ToolMessage) {
+          await messageDao.createMessage({
+            content: newMessage.text,
+            author: "tool",
+            conversation: conversationId,
+            toolCallId: newMessage.tool_call_id,
+          });
+        }
+      }
     }
 
-
-
-
-
-    await messageDao.createMessage({
-      content: aiMessage,
-      author: "ai",
-      conversation: conversationId,
-    });
     res.end();
   },
 );

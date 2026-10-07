@@ -9,6 +9,8 @@ class MessageDao {
       content,
       author,
       conversation,
+      toolCallId:messageData.toolCallId,
+      toolCalls:messageData.toolCalls,
     });
   }
 
@@ -24,6 +26,8 @@ class MessageDao {
       conversation: message.conversation.toString(),
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
+      toolCallId:message.toolCallId,
+      toolCalls:message.toolCalls
     }));
   }
 }
