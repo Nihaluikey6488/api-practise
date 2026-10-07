@@ -11,6 +11,15 @@ class ConversationDao {
     const conversation = await ConversationModel.create(input);
     return conversation;
   }
+
+  async findConversationByUser(user:string){
+
+    return ConversationModel.find({user}).sort({updatedAt:1}).lean()
+  }
+
+  async findConversationByIdAndUser(conversationId:string,user:string){
+    return ConversationModel.findOne({ _id: conversationId, user }).lean();
+  }
 }
 
 export const conversationDao = new ConversationDao();

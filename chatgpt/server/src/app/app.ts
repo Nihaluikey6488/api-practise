@@ -38,6 +38,7 @@ app.get("*name", (_req, res) => {
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const statusCode = error instanceof ApiError ? error.statusCode : 500;
   const message = error instanceof Error ? error.message : "Internal server error";
+  console.log("error",error)
 
   res.status(statusCode).json({ message });
 });

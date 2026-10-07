@@ -8,7 +8,7 @@ const MessageSchema=new Schema({
     },
     author:{
         type:String,
-        enum:["user","ai"],
+        enum:["user","ai","tool"],
         default:"user"
     },
     content:{
@@ -17,7 +17,18 @@ const MessageSchema=new Schema({
         trim:true,
         minlength:1
 
-    }
+    },
+    toolCalls:[
+        {
+            argments:Object,
+            id:String,
+            name:String
+            
+            
+
+        }
+    ],
+    toolCallId: String,
     
 },{
     timestamps:true
