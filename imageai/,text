@@ -1,0 +1,41 @@
+{
+  object: 'conversation.response',
+  conversationId: 'conv_01a1892cf63476898f853c2e857ecf20',
+  outputs: [
+    {
+      object: 'entry',
+      type: 'tool.execution',
+      createdAt: 2026-10-29T19:39:48.602Z,
+      completedAt: 2026-10-29T19:39:58.698Z,
+      agentId: 'ag_01a1892cf4ae775c8babf3c6d4aef5e5',
+      model: 'mistral-medium-latest',
+      id: 'tool_exec_01a1892cf9fa724e92a27d68f18380fb',
+      name: 'image_generation',
+      arguments: '{"prompt": "A cyberpunk samurai standing in a dark futuristic city. The samurai wears a high-tech armor blending traditional Japanese elements with futuristic cybernetic enhancements. Neon lights, holographic billboards, and towering skyscrapers fill the background. The atmosphere is moody, with rain and mist adding to the dystopian vibe. The samurai holds a glowing katana, and the scene is rich in detail, capturing the essence of a cyberpunk world."}',
+      info: {
+        result: '{"url": "https://mistralaiblackforestprod.blob.core.windows.net/images/pruna/13b8/8a4b/-675/4-414e-8747-bf24a8dbd5e2/image.jpg?se=2026-10-29T20%3A39%3A58Z&sp=r&sv=2026-02-06&sr=b&skoid=8aae9820-8683-45ec-b557-e441def5aa94&sktid=4fbc1168-2984-4d17-af19-ac5138c2378e&skt=2026-10-29T19%3A39%3A58Z&ske=2026-10-29T20%3A39%3A58Z&sks=b&skv=2026-02-06&sig=Bg7toBkLP/XV203B2kZBNR7OrnPzWBvE3g9nTo%2B%2BSII%3D"}'
+      }
+    },
+    {
+      object: 'entry',
+      type: 'message.output',
+      createdAt: 2026-10-29T19:39:58.963Z,
+      completedAt: 2026-10-29T19:40:00.974Z,
+      agentId: 'ag_01a1892cf4ae775c8babf3c6d4aef5e5',
+      model: 'mistral-medium-latest',
+      id: 'msg_01a1892d2273751388a168af7f40bb86',
+      role: 'assistant',
+      content: 'Here is your cyberpunk samurai in a dark futuristic city:\n' +
+        '\n' +
+        '![Cyberpunk Samurai](https://mistralaiblackforestprod.blob.core.windows.net/images/pruna/13b8/8a4b/-675/4-414e-8747-bf24a8dbd5e2/image.jpg?se=2026-10-29T20%3A39%3A58Z&sp=r&sv=2026-02-06&sr=b&skoid=8aae9820-8683-45ec-b557-e441def5aa94&sktid=4fbc1168-2984-4d17-af19-ac5138c2378e&skt=2026-10-29T19%3A39%3A58Z&ske=2026-10-29T20%3A39%3A58Z&sks=b&skv=2026-02-06&sig=Bg7toBkLP/XV203B2kZBNR7OrnPzWBvE3g9nTo%2B%2BSII%3D)'
+    }
+  ],
+  usage: {
+    promptTokens: 186,
+    completionTokens: 421,
+    totalTokens: 902,
+    connectorTokens: 295,
+    connectors: { image_generation: 1 }
+  },
+  guardrails: null
+}

@@ -122,6 +122,8 @@ while (true) {
     messages,
   });
 
+  
+
   const lastMessage = response.messages.at(-1);
   messages.push(new AIMessage(lastMessage.content));
 
